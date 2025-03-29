@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Username: Guest"
+        android:textSize="16sp"
+        android:textColor="#FFFFFF"
+        android:paddingBottom="8dp"/>
+
+    <!-- Grafik BarChart -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="16dp"
+        android:text="History"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <com.github.mikephil.charting.charts.BarChart
+        android:id="@+id/barChart"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="#6A1B9A" />
+
+    <!-- Tombol filter grafik -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingTop="16dp">
+
+        <Button
+            android:id="@+id/btnDaily"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#7B1FA2"
+            android:padding="8dp"
+            android:text="Daily"
+            android:textColor="#FFFFFF" />
+
+        <Button
+            android:id="@+id/btnWeekly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:backgroundTint="#7B1FA2"
+            android:padding="8dp"
+            android:text="Weekly"
+            android:textColor="#FFFFFF" />
+
+        <Button
+            android:id="@+id/btnMonthly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:backgroundTint="#7B1FA2"
+            android:padding="8dp"
+            android:text="Monthly"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+
+    <!-- Statistik konsumsi air -->
+    <TextView
+        android:id="@+id/tvWeeklyAvg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="16dp"
+        android:text="Weekly average: 0 ml/day"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/tvMonthlyAvg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Monthly average: 0 ml/day"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/tvCompletion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Average completion: 0%"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp" />
+
+    </LinearLayout>
