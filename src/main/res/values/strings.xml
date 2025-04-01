@@ -1,8 +1,0 @@
-<resources>
-    <string name="app_name">aplikasipertama</string>
-    <string-array name="water_units">
-        <item>ml</item>
-        <item>oz</item>
-    </string-array>
-
-</resources>
