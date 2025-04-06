@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "976236664935",
+    "project_id": "dringking-reminder",
+    "storage_bucket": "dringking-reminder.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:976236664935:android:c45a9d01de7fc200cadcc2",
+        "android_client_info": {
+          "package_name": "com.example.aplikasipertama"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7DNefT7N3YLZbaX7mP54PEPhRJZ12RXE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
