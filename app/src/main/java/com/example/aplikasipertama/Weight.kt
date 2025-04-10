@@ -71,27 +71,42 @@ class WeightActivity : AppCompatActivity() {
     }
 
     private fun saveUserWeight(username: String, weight: Float) {
-        val userRef = db.collection("user").document(username)
+        val usersRef = db.collection("users")
 
-        userRef.set(mapOf("weight" to weight), SetOptions.merge())
-            .addOnSuccessListener {
-                Log.d("WeightActivity", "Berat badan diperbarui: $weight")
+        // Cari dokumen yang username-nya sama
+        usersRef.whereEqualTo("username", username).get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    val document = querySnapshot.documents[0] // Ambil dokumen pertama yang cocok
+                    val userRef = usersRef.document(document.id)
 
-                // Simpan ke SharedPreferences
-                sharedPreferences.edit()
-                    .putString("username", username)
-                    .putFloat("weight", weight)
-                    .apply()
+                    userRef.set(mapOf("weight" to weight), SetOptions.merge())
+                        .addOnSuccessListener {
+                            Log.d("WeightActivity", "Berat badan diperbarui: $weight")
 
-                // Pindah ke MainActivity
-                val intent = Intent(this, MainActivity::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                startActivity(intent)
-                finish()
+                            // Simpan ke SharedPreferences
+                            sharedPreferences.edit()
+                                .putString("username", username)
+                                .putFloat("weight", weight)
+                                .apply()
+
+                            // Pindah ke MainActivity
+                            val intent = Intent(this, MainActivity::class.java)
+                            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                            startActivity(intent)
+                            finish()
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("WeightActivity", "Gagal menyimpan berat badan", e)
+                            Toast.makeText(this, "Gagal menyimpan berat badan!", Toast.LENGTH_LONG).show()
+                        }
+                } else {
+                    Log.e("WeightActivity", "User dengan username '$username' tidak ditemukan.")
+                    Toast.makeText(this, "User tidak ditemukan!", Toast.LENGTH_LONG).show()
+                }
             }
             .addOnFailureListener { e ->
-                Log.e("WeightActivity", "Error saat menyimpan berat badan", e)
-                Toast.makeText(this, "Gagal menyimpan berat badan!", Toast.LENGTH_LONG).show()
+                Log.e("WeightActivity", "Gagal mengambil data user", e)
+                Toast.makeText(this, "Gagal mengambil data user!", Toast.LENGTH_LONG).show()
             }
-    }
-}
+    }}

@@ -13,9 +13,12 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import java.time.LocalDate
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
@@ -161,6 +164,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun editEntry(position: Int) {
+        Log.i("MainActivity", "editEntry called with position: $position")
         val options = arrayOf("100 ml", "250 ml", "535 ml", "600 ml")
         val values = intArrayOf(100, 250, 535, 600)
 
@@ -175,7 +179,7 @@ class MainActivity : AppCompatActivity() {
                 val waterEntryRef = db.collection("users")
                     .document(userId)
                     .collection("waterIntake")
-                    .document(entry.timestamp)
+                    .document(entry.timestamp.toString())
 
                 waterEntryRef.update("amount", updatedAmount)
                     .addOnSuccessListener {
@@ -200,7 +204,7 @@ class MainActivity : AppCompatActivity() {
         val entry = historyList[position]
 
         db.collection("users").document(userId)
-            .collection("waterIntake").document(entry.timestamp)
+            .collection("waterIntake").document(entry.timestamp.toString())
             .delete()
             .addOnSuccessListener {
                 // Hapus dari RecyclerView
@@ -239,13 +243,16 @@ class MainActivity : AppCompatActivity() {
         waterIntake += amount
         updateWaterIntakeUI()
         updateProgressBar()
-        val timestamp = System.currentTimeMillis().toString()
-        val newEntry = WaterIntakeEntry(amount, timestamp)
+        val timestampRaw = System.currentTimeMillis()
+        val timestampString = timestampRaw.toString()
+        val timestamp = Timestamp(timestampRaw / 1000, ((timestampRaw % 1000) * 1000000).toInt())
+//        Log.d("Kontol", timestamp)
+        val newEntry = WaterIntakeEntry(amount, timestamp, timestampString)
 
-        historyList.add(0, newEntry)
+//        historyList.add(0, newEntry)
         adapter.notifyItemInserted(0)
         recyclerViewHistory.scrollToPosition(0)
-        saveWaterIntakeToDB(amount, timestamp)
+        saveWaterIntakeToDB(amount, timestampString)
         saveTotalWaterIntakeToDB()
     }
 
@@ -262,18 +269,16 @@ class MainActivity : AppCompatActivity() {
 
         db.collection("users").document(userId)
             .collection("waterIntake")
-            .orderBy("timestamp") // Urutkan berdasarkan waktu
+            .orderBy("timestamp") // assuming this is Firestore Timestamp
             .get()
             .addOnSuccessListener { result ->
                 historyList.clear()
+                waterIntake = 0
                 for (document in result) {
                     val amount = document.getLong("amount")?.toInt() ?: 0
-                    val timestamp = document.getString("timestamp") ?: ""
-                    if (timestamp.isNotEmpty()) {
-                        historyList.add(WaterIntakeEntry(amount, timestamp))
-                        waterIntake += amount; // Tambahkan ke total
-
-                    }
+                    val timestamp = document.getTimestamp("timestamp")?.toDate()?.time.toString()
+//                    historyList.add(WaterIntakeEntry(amount, timestamp))
+                    waterIntake += amount
                 }
                 adapter.notifyDataSetChanged()
                 updateWaterIntakeUI()
@@ -286,13 +291,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun saveWaterIntakeToDB(amount: Int, timestamp: String) {
         val userId = auth.currentUser?.uid ?: return
-        val entry = hashMapOf("amount" to amount, "timestamp" to timestamp)
+        val entry = hashMapOf(
+            "amount" to amount,
+            "timestamp" to com.google.firebase.Timestamp.now()
+        )
 
         db.collection("users").document(userId)
             .collection("waterIntake").document(timestamp)
             .set(entry, SetOptions.merge())
             .addOnSuccessListener {
-                Log.d("Firestore", "Data konsumsi air disimpan")
+                Log.d("Firestore", "Data konsumsi air disimpan.")
             }
             .addOnFailureListener { e ->
                 Log.e("Firestore", "Gagal menyimpan data: ${e.message}")

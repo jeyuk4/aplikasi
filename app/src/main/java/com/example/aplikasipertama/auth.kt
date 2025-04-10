@@ -39,20 +39,30 @@ class AuthActivity : AppCompatActivity() {
     }
 
     private fun checkOrRegisterUser(username: String) {
-        val userRef = db.collection("user").document(username)
+        // Instead of using document with specific username, use 'add' to create a new document with a generated ID
+        val usersCollectionRef = db.collection("users")
 
-        userRef.get()
-            .addOnSuccessListener { document ->
-                if (document.exists()) {
+        // Create user data
+        val userData = hashMapOf(
+            "username" to username,
+            "weight" to "" // Default, nanti diperbarui di WeightActivity
+        )
+
+        // Check if the user already exists
+        usersCollectionRef.whereEqualTo("username", username)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    // If user exists, get the first matching document
+                    val document = querySnapshot.documents.first()
                     saveUserSession(username)
                     goToWeighActivity(username)
                 } else {
-                    val userData = hashMapOf(
-                        "username" to username,
-                        "weight" to "" // Default, nanti diperbarui di WeightActivity
-                    )
-                    userRef.set(userData, SetOptions.merge())
-                        .addOnSuccessListener {
+                    // If user doesn't exist, create a new document with the user data
+                    usersCollectionRef.add(userData)
+                        .addOnSuccessListener { documentReference ->
+                            // Get the newly created document's ID (if needed)
+                            Log.d("AuthActivity", "Document added with ID: ${documentReference.id}")
                             saveUserSession(username)
                             goToWeighActivity(username)
                         }

@@ -9,13 +9,27 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import com.google.firebase.Timestamp
+import java.text.SimpleDateFormat
+import java.util.*
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 // Model data untuk menyimpan riwayat minum
-data class WaterIntakeEntry(val amount: Int, val timestamp: String)
+data class WaterIntakeEntry(
+    val amount: Int,
+    val timestamp: Timestamp,
+    val docId: String
+) {
+    // Untuk keperluan tampilan di UI
+    fun getFormattedDate(): String {
+        val sdf = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
+        return sdf.format(timestamp.toDate())
+    }
+}
+
 
 class WaterIntakeAdapter(
     private val context: Context,
@@ -83,8 +97,7 @@ class WaterIntakeAdapter(
                 val waterEntryRef = db.collection("user")
                     .document(userId)
                     .collection("timestamp")
-                    .document(entry.timestamp)
-
+                    .document(entry.docId)
                 waterEntryRef.update("amount", updatedAmount)
                     .addOnSuccessListener {
                         Log.d("Firestore", "Data konsumsi air berhasil diperbarui")
@@ -112,7 +125,7 @@ class WaterIntakeAdapter(
         val waterEntryRef = db.collection("user")
             .document(userId)
             .collection("timestamp")
-            .document(entry.timestamp)
+            .document(entry.docId)
 
         AlertDialog.Builder(context)
             .setTitle("Hapus Entri")
